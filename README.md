@@ -33,6 +33,37 @@ Within AI Impact Platform, DriftEngine is the runtime evaluation layer.
 
 It receives evaluation requests, compares baseline and candidate behavior, and emits structured drift results that can feed release decisions in Delivery Engine and workflow visibility in AI Impact Portal.
 
+## Weighted Scoring Architecture
+
+DriftEngine uses a weighted release-safety model so a decision is explainable instead of being a black-box pass/fail check.
+
+The scoring flow:
+
+1. Compare candidate behavior against an approved baseline.
+2. Calculate a semantic drift score.
+3. Normalize that drift score against the workflow's configured threshold.
+4. Add qualitative regression evidence from an evaluator/judge signal.
+5. Combine the signals with configurable weights.
+6. Map the weighted score into risk bands.
+7. Return an explicit release gate result: `SAFE` or `BLOCK`.
+
+Default scoring shape:
+
+| Signal | Purpose | Example weight |
+| --- | --- | --- |
+| Drift score | Measures how far candidate behavior moved from the approved baseline | `0.60` |
+| Judge regression flag | Captures qualitative evidence that the behavior regressed | `0.40` |
+
+Risk band mapping:
+
+| Weighted score | Risk level | Release posture |
+| --- | --- | --- |
+| `0.00 - 0.40` | `LOW` | Usually `SAFE` |
+| `0.41 - 0.70` | `MEDIUM` | Usually `BLOCK` or review-required |
+| `0.71 - 1.00` | `HIGH` | Usually `BLOCK` |
+
+This lets different workflows tune their own thresholds and weights. A low-risk summarization assistant may tolerate more semantic movement, while a regulated document-reasoning workflow can use stricter bands or hard-block behavior when a judge flags regression.
+
 ## Example Use Cases
 
 - Validate model upgrades before production
@@ -52,4 +83,3 @@ Active private product development.
 ## Source Code
 
 The source code is private because this is an active commercial product. This public repository is a product overview for recruiters, collaborators, and interviewers.
-
