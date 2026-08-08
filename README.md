@@ -37,6 +37,22 @@ It receives evaluation requests, compares baseline and candidate behavior, and e
 
 DriftEngine uses a weighted release-safety model so a decision is explainable instead of being a black-box pass/fail check.
 
+```text
+Candidate behavior
+       |
+       v
+Semantic drift score vs baseline
+       |
+       v
+Judge regression signal
+       |
+       v
+Weighted composite score
+       |
+       v
+Risk band -> ImpactGate -> SAFE / BLOCK
+```
+
 The scoring flow:
 
 1. Compare candidate behavior against an approved baseline.
